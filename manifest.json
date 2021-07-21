@@ -1,7 +1,11 @@
 {
-	"name": "Nigerian Logos",
-  "id": "949697027067571105",
+	"name": "Bavatars",
+  "id": "999661511334406897",
 	"api": "1.0.0",
 	"main": "dist/code.js",
-	"ui": "dist/ui.html"
+	"ui": "dist/ui.html",
+	"menu": [
+		{"name": "Fill Object(s) Randomly", "command": "random"},
+  	{"name": "Select and Fill", "command": "select"}
+	]
 }

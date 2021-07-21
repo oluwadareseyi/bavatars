@@ -1,6 +1,6 @@
 <template>
   <main class="c-main">
-    <form @submit.prevent="fetchIcons" class="c-search">
+    <!-- <form @submit.prevent="fetchIcons" class="c-search">
       <div class="c-input">
         <input
           type="text"
@@ -13,9 +13,9 @@
           alt=""
         />
       </div>
-      <!-- <button type="submit">Search</button> -->
-    </form>
-    <div class="c-body">
+    </form> -->
+
+    <!-- <div class="c-body">
       <div v-if="search" class="c-logos">
         <div>
           <div class="c-grid" v-if="filteredCompanies.length">
@@ -58,7 +58,7 @@
         </div>
       </div>
       <welcome v-else />
-    </div>
+    </div> -->
   </main>
 </template>
 
@@ -101,32 +101,45 @@ export default {
     window.iconInput.init();
     window.disclosure.init();
 
-    const fetchCompanies = async () => {
-      try {
-        const res = await axios.get(`${this.baseUrl}/logos`);
-        this.companies = res.data;
-      } catch (error) {
-        const { response } = error;
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: 'close',
-              message: response.data.message
-            }
-          },
-          '*'
-        );
-      }
-    };
+    // window.onmessage = event => {
+    //   const { type, name, data } = event.data.pluginMessage;
 
-    fetchCompanies();
+    //   //  recieve data
+    //   if (type === 'event-name') {
+    //     console.log('event called');
+    //   }
+    // };
 
     window.onmessage = event => {
-      const { type, name, data } = event.data.pluginMessage;
+      const { type, name = '', data = '' } = event.data.pluginMessage;
 
       //  recieve data
-      if (type === 'event-name') {
-        console.log('event called');
+      if (type === 'random') {
+        const fetchRandomAvatar = async () => {
+          try {
+            const res = axios.get(
+              'https://api.bavatars.co/api/bavatars?gender=female'
+            );
+
+            const data = res.data;
+
+            console.log(data);
+
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: 'random',
+                  data
+                }
+              },
+              '*'
+            );
+          } catch (error) {
+            console.log(error);
+          }
+        };
+
+        fetchRandomAvatar();
       }
     };
   },
