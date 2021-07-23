@@ -56,8 +56,8 @@ if (figma.command === 'random') {
   });
 } else {
   figma.showUI(__html__, {
-    width: 460,
-    height: 590
+    width: 790,
+    height: 580
   });
 }
 
@@ -69,7 +69,7 @@ figma.ui.onmessage = event => {
     }
     figma.closePlugin();
   }
-  if (event.type === 'show-message') {
+  if (event.type === 'show-error') {
     figma.notify('A network error occured, please try again');
   }
   if (event.type === 'getimages') {
