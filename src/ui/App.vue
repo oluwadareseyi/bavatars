@@ -69,20 +69,19 @@ import '../figma/figma-ds/js/disclosure';
 import axios from 'axios';
 
 import Welcome from './components/Welcome';
-import EmptyIcon from './components/empty-icon.vue';
 
 export default {
   data() {
     return {
       search: '',
       loading: false,
-      baseUrl: 'https://nigerian-logos-server.herokuapp.com/api',
+      baseUrl: 'https://api.bavatars.co/api/bavatars',
       companies: null
     };
   },
 
   computed: {
-    filteredCompanies() {
+    searchParams() {
       const filter = this.search.toLowerCase();
       return this.companies.filter(
         company => company.filename.indexOf(filter) > -1
@@ -91,8 +90,7 @@ export default {
   },
 
   components: {
-    Welcome,
-    EmptyIcon
+    Welcome
   },
 
   mounted() {
@@ -111,35 +109,10 @@ export default {
     // };
 
     window.onmessage = event => {
-      const { type, name = '', data = '' } = event.data.pluginMessage;
-
+      const { type = '', name = '', data = 1 } = event.data.pluginMessage;
       //  recieve data
       if (type === 'random') {
-        const fetchRandomAvatar = async () => {
-          try {
-            const res = axios.get(
-              'https://api.bavatars.co/api/bavatars?gender=female'
-            );
-
-            const data = res.data;
-
-            console.log(data);
-
-            parent.postMessage(
-              {
-                pluginMessage: {
-                  type: 'random',
-                  data
-                }
-              },
-              '*'
-            );
-          } catch (error) {
-            console.log(error);
-          }
-        };
-
-        fetchRandomAvatar();
+        this.fetchRandomAvatar(data);
       }
     };
   },
@@ -154,28 +127,79 @@ export default {
         '*'
       );
     },
-    async fetchIcons() {},
-    async importSvg(filename) {
+    async fetchAvatar(imageUrl) {
       try {
-        const res = await axios.get(`${this.baseUrl}/logos/${filename}`);
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: 'icon-loaded',
-              data: res.data
-            }
-          },
-          '*'
-        );
+        const res = await fetch(imageUrl);
+        const a = await res.arrayBuffer();
+        return new Uint8Array(a);
       } catch (error) {
-        parent.postMessage(
-          {
-            pluginMessage: {
-              type: 'show-message'
-            }
-          },
-          '*'
+        console.log(error);
+      }
+    },
+
+    async fetchRandomAvatar(num = 1) {
+      try {
+        let number = 0;
+        const res = await axios.get(
+          `${this.baseUrl}?shuffle=true&number=${num}`
         );
+
+        let imageArray = [];
+
+        const dataArray = res.data.data;
+
+        for (const data of dataArray) {
+          const res = await this.fetchAvatar(data.url);
+
+          imageArray.push(res);
+          number += 1;
+          if (number === num) {
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: 'getimages',
+                  data: imageArray
+                }
+              },
+              '*'
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async fetchSpecificAvatar(num = 1) {
+      try {
+        let number = 0;
+        const res = await axios.get(
+          `${this.baseUrl}?gender=female&shuffle=true&number=1`
+        );
+
+        let imageArray = [];
+
+        const dataArray = res.data.data;
+
+        for (const data of dataArray) {
+          const res = await this.fetchAvatar(data.url);
+
+          imageArray.push(res);
+          number += 1;
+          if (number === num) {
+            parent.postMessage(
+              {
+                pluginMessage: {
+                  type: 'getimages',
+                  data: imageArray
+                }
+              },
+              '*'
+            );
+          }
+        }
+      } catch (error) {
+        console.log(error);
       }
     }
   }
