@@ -1,5 +1,73 @@
 <template>
-  <main class="c-main"></main>
+  <main class="c-main">
+    <section class="c-header">
+      <div class="c-header__list">
+        <div class="c-list__title">Show:</div>
+        <button
+          @click="resetAll"
+          :class="`c-list__item ${!oneActive ? 'active' : ''}`"
+        >
+          All
+        </button>
+      </div>
+
+      <div class="c-header__list">
+        <div class="c-list__title">By Gender:</div>
+        <button
+          :class="`c-list__item ${item.active ? 'active' : ''}`"
+          v-for="(item, index) in gender"
+          :key="index"
+          @click="setGender(item.name)"
+        >
+          {{ item.name }}
+        </button>
+      </div>
+
+      <div class="c-header__list">
+        <div class="c-list__title">By Type:</div>
+        <button
+          v-for="(item, index) in nature"
+          :class="`c-list__item ${item.active ? 'active' : ''}`"
+          :key="index"
+          @click="setNature(item.name)"
+        >
+          {{ item.name }}
+        </button>
+      </div>
+
+      <div class="c-header__list">
+        <div class="c-list__title">By Age:</div>
+        <select class="c-list__select" v-model="selected">
+          <option value="">All ages</option>
+          <option>18-25</option>
+          <option>26-39</option>
+          <option>40+</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="c-body">
+      <div class="c-grid" v-if="!loading && filteredAvatars">
+        <div
+          class="c-box"
+          :style="`--delay: 0.${index}s`"
+          v-for="(avatar, index) in filteredAvatars"
+          :key="index"
+        >
+          <img
+            :src="avatar.url"
+            alt="avatar"
+            class="cbox__image"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+
+    <footer class="c-footer">
+      <logo />
+    </footer>
+  </main>
 </template>
 
 <script>
@@ -9,17 +77,19 @@ import '../figma/figma-ds/js/disclosure';
 import axios from 'axios';
 
 import Welcome from './components/Welcome';
+import Close from './components/Close.vue';
+import Logo from './components/Logo.vue';
 
 export default {
   data() {
     return {
-      search: '',
+      selected: '',
       loading: false,
       baseUrl: 'https://api.bavatars.co/api/bavatars',
       avatars: null,
       gender: [
         { name: 'male', active: false },
-        { name: 'female', active: true }
+        { name: 'female', active: false }
       ],
       nature: [
         { name: 'casual', active: false },
@@ -42,13 +112,27 @@ export default {
           ? avatar.nature === natureFilter.name
           : true;
 
-        return gFilter && nFilter;
+        const ageFilter = this.selected
+          ? avatar.age_range === this.selected
+          : true;
+
+        return gFilter && nFilter && ageFilter;
       });
+    },
+    oneActive() {
+      const genderFilter = this.gender.find(gender => gender.active === true);
+      const natureFilter = this.nature.find(nature => nature.active === true);
+
+      return (
+        Boolean(genderFilter) || Boolean(natureFilter) || Boolean(this.selected)
+      );
     }
   },
 
   components: {
-    Welcome
+    Welcome,
+    Close,
+    Logo
   },
 
   mounted() {
@@ -182,6 +266,56 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+
+    setGender(name = null, reset = false) {
+      this.gender = this.gender.map(item => {
+        if (!reset) {
+          if (item.name === name) {
+            return {
+              ...item,
+              active: !item.active
+            };
+          } else {
+            return {
+              ...item,
+              active: false
+            };
+          }
+        } else {
+          return {
+            ...item,
+            active: false
+          };
+        }
+      });
+    },
+    setNature(name = null, reset = false) {
+      this.nature = this.nature.map(item => {
+        if (!reset) {
+          if (item.name === name) {
+            return {
+              ...item,
+              active: !item.active
+            };
+          } else {
+            return {
+              ...item,
+              active: false
+            };
+          }
+        } else {
+          return {
+            ...item,
+            active: false
+          };
+        }
+      });
+    },
+    resetAll() {
+      this.setGender(null, true);
+      this.setNature(null, true);
+      this.selected = '';
     }
   }
 };

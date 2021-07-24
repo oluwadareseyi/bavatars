@@ -1,8 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500&display=swap');
 
-$col-gray: #696969;
-$col-purple: #753ff6;
-$col-green: #06daaf;
+$col-gray: #d8d8d8;
+$bg-red: #fff7f7;
+$col-red: #ff0000;
+$border-gray: #d7d7d7;
+$text-gray: #a9a9a9;
+$select-gray: #c4c4c4;
+$col-black: #333333;
 
 * {
   box-sizing: border-box;
@@ -12,14 +16,14 @@ body {
   margin: 0;
   font-family: 'Heebo', sans-serif;
   background: #ffffff;
-  padding: 28px 20px;
   font-weight: 400;
+  font-size: 12px;
+}
 
-  max-width: 800px;
-  margin: auto;
-  border: 1px solid #d7d7d7;
-  border-radius: 8px;
-  margin-top: 5rem;
+button,
+input,
+select {
+  font-family: 'Heebo', sans-serif;
 }
 
 h1,
@@ -32,69 +36,71 @@ p {
 }
 
 .c-main {
-  h1 {
-    font-size: 20px;
-  }
-
-  .c-search {
+  position: relative;
+  height: 100%;
+  .c-header {
+    padding: 20px 55px;
+    border-bottom: 1px solid $border-gray;
     display: flex;
 
-    .c-input {
-      position: relative;
-      width: 100%;
-
-      img {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        left: 15px;
-      }
-    }
-
-    input {
-      width: 100%;
-      background: #ffffff;
-      border: 1px solid #e2e1e1;
-      box-shadow: 0px 4px 4px rgba(51, 51, 51, 0.04);
-      border-radius: 4px;
-      height: 50px;
-      text-indent: 35px;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      outline: none;
-      font-size: 17px;
-
-      &::placeholder {
-        color: #b1b0b0;
-        font-weight: 400;
-        font-size: 16px;
+    &__list {
+      display: flex;
+      align-items: center;
+      &:not(:last-of-type) {
+        margin-right: 32px;
       }
 
-      &:focus {
-        border: 1.5px solid $col-green;
-      }
-    }
+      .c-list {
+        &__title {
+          margin-right: 5px;
+          flex-shrink: 0;
 
-    button {
-      background: $col-green;
-      width: 150px;
-      border: 0;
-      color: #ffffff;
-      font-family: 'Inter', sans-serif;
-      font-weight: 600;
-      font-size: 16px;
-      outline: none;
-      cursor: pointer;
+          &:last-of-type {
+            margin-right: 10px;
+          }
+        }
 
-      &:disabled {
-        filter: grayscale(100%);
+        &__item {
+          background: transparent;
+          border: 0;
+          padding: 2px 10px;
+          color: $text-gray;
+          transition: background 0.3s;
+
+          text-transform: capitalize;
+          cursor: pointer;
+          border-radius: 100px;
+
+          &:focus:not(:focus-visible) {
+            outline: none;
+          }
+
+          &.active {
+            background: $bg-red;
+            font-weight: 500;
+            color: $col-red;
+          }
+
+          &:not(:last-of-type) {
+            margin-right: 2px;
+          }
+        }
+
+        &__select {
+          width: 77px;
+          height: 28px;
+          text-indent: 5px;
+          color: $text-gray;
+          border: 1px solid $select-gray;
+        }
       }
     }
   }
 
   .c-body {
+    padding: 44px 84px;
     height: 460px;
-    overflow: scroll;
+    overflow: auto;
     &::-webkit-scrollbar {
       background-color: #fff;
       width: 7px;
@@ -105,18 +111,36 @@ p {
     }
 
     &::-webkit-scrollbar-thumb {
-      background-color: rgba($col-gray, 0.7);
-      border-radius: 40px;
+      background-color: #e4e4e4;
+      border-radius: 8px;
     }
 
     .c-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(157px, 1fr));
-      grid-column-gap: 10px;
-      grid-row-gap: 18px;
-      margin-top: 24px;
+      grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+      grid-gap: 8px;
 
-      
+      .c-box {
+        height: 80px;
+        background: $col-gray;
+        cursor: pointer;
+        overflow: hidden;
+        animation: slideUp 0.3s;
+        border-radius: 6px;
+
+        &:hover {
+          img {
+            transform: scale(1.1);
+          }
+        }
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: transform 0.3s;
+        }
+      }
     }
 
     .c-empty {
@@ -136,24 +160,16 @@ p {
     }
   }
 
-  .c-splash {
+  .c-footer {
+    height: 80px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100%;
-    text-align: center;
-
-    h3 {
-      margin-top: 23px;
-      margin-bottom: 10px;
-      font-size: 20px;
-    }
-
-    p {
-      color: $col-gray;
-      font-weight: 400;
-      max-width: 300px;
-    }
   }
 }
 
