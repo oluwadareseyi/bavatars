@@ -21,21 +21,24 @@ const createImage = (
 
 const getMany = (data: Uint8Array[], selection: readonly SceneNode[]) => {
   // @ts-ignore
-  data.forEach((image, index) => {
-    if (
-      selection[index].type === 'RECTANGLE' ||
-      selection[index].type === 'ELLIPSE'
-    ) {
-      try {
-        // @ts-ignore
-        createImage(image, selection[index]);
-      } catch (error) {
-        figma.notify('Image tyoe is unspported');
+
+  data
+    .slice(0, data.length === selection.length ? data.length : data.length - 1)
+    .forEach((image, index) => {
+      if (
+        selection[index].type === 'RECTANGLE' ||
+        selection[index].type === 'ELLIPSE'
+      ) {
+        try {
+          // @ts-ignore
+          createImage(image, selection[index]);
+        } catch (error) {
+          figma.notify('Image tyoe is unspported');
+        }
+      } else {
+        figma.notify('Please selcct a rectangle or Elipse');
       }
-    } else {
-      figma.notify('Please selcct a rectangle or Elipse');
-    }
-  });
+    });
 };
 
 const selection = figma.currentPage.selection;
