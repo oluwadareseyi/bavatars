@@ -100,7 +100,11 @@ figma.ui.onmessage = event => {
         }
       }
     } else {
-      getMany(event.data, selection);
+      if (selection.length > 1) {
+        figma.notify('You can only select and fill one at a time');
+      } else {
+        getMany(event.data, selection);
+      }
     }
   }
 };
