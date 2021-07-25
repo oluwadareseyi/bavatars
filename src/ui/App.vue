@@ -47,12 +47,16 @@
     </section>
 
     <section class="c-body">
-      <div class="c-grid" v-if="!loading && filteredAvatars">
+      <div
+        class="c-grid"
+        v-if="!loading && filteredAvatars && filteredAvatars.length"
+      >
         <div
           class="c-box"
-          :style="`--delay: 0.${index}s`"
           v-for="(avatar, index) in filteredAvatars"
+          :style="`--delay: ${index}`"
           :key="index"
+          @click="fillAvatar(avatar.url)"
         >
           <img
             :src="avatar.url"
@@ -61,6 +65,16 @@
             loading="lazy"
           />
         </div>
+      </div>
+      <div
+        class="c-empty"
+        v-if="!loading && filteredAvatars && !filteredAvatars.length"
+      >
+        <div class="c-empty__icons">
+          <div class="icon" />
+          <div class="icon" />
+        </div>
+        <h1 class="c-empty__text">We found no Search results!</h1>
       </div>
     </section>
 
@@ -150,17 +164,15 @@ export default {
     //   }
     // };
 
-    this.fetchAvatars();
-
-    // window.onmessage = event => {
-    //   const { type = '', name = '', data = 1 } = event.data.pluginMessage;
-    //   //  recieve data
-    //   if (type === 'random') {
-    //     this.fetchRandomAvatar(data);
-    //   } else {
-    //     // this.fetchAvatars();
-    //   }
-    // };
+    window.onmessage = event => {
+      const { type = '', name = '', data = 1 } = event.data.pluginMessage;
+      //  recieve data
+      if (type === 'random') {
+        this.fetchRandomAvatar(data);
+      } else {
+        this.fetchAvatars();
+      }
+    };
   },
   methods: {
     buttonClick() {
@@ -212,40 +224,43 @@ export default {
           }
         }
       } catch (error) {
-        console.log(error);
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'show-error',
+              data: ''
+            }
+          },
+          '*'
+        );
       }
     },
 
-    async fetchSpecificAvatar(num = 1) {
+    async fillAvatar(image) {
       try {
-        let number = 0;
-        const res = await axios.get(
-          `${this.baseUrl}?gender=female&shuffle=true&number=1`
-        );
-
         let imageArray = [];
+        const res = await this.fetchAvatar(image);
+        imageArray.push(res);
 
-        const dataArray = res.data.data;
-
-        for (const data of dataArray) {
-          const res = await this.fetchAvatar(data.url);
-
-          imageArray.push(res);
-          number += 1;
-          if (number === num) {
-            parent.postMessage(
-              {
-                pluginMessage: {
-                  type: 'getimages',
-                  data: imageArray
-                }
-              },
-              '*'
-            );
-          }
-        }
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'getimagesnoclose',
+              data: imageArray
+            }
+          },
+          '*'
+        );
       } catch (error) {
-        console.log(error);
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: 'show-error',
+              data: ''
+            }
+          },
+          '*'
+        );
       }
     },
 

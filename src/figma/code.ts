@@ -13,10 +13,7 @@ const createImage = (
   } else {
     rect = figma.createEllipse();
   }
-  rect.fills = [
-    // { type: 'SOLID', color: { r: 1, g: 0, b: 0 } },
-    { type: 'IMAGE', scaleMode: 'FILL', imageHash }
-  ];
+  rect.fills = [{ type: 'IMAGE', scaleMode: 'FILL', imageHash }];
   figma.currentPage.appendChild(rect);
   nodes.push(rect);
   figma.viewport.scrollAndZoomIntoView(nodes);
@@ -71,6 +68,7 @@ figma.ui.onmessage = event => {
   }
   if (event.type === 'show-error') {
     figma.notify('A network error occured, please try again');
+    figma.closePlugin();
   }
   if (event.type === 'getimages') {
     if (selection.length === 0) {
@@ -85,6 +83,22 @@ figma.ui.onmessage = event => {
       getMany(event.data, selection);
     }
     figma.closePlugin();
+  }
+
+  if (event.type === 'getimagesnoclose') {
+    const selection = figma.currentPage.selection;
+
+    if (selection.length === 0) {
+      for (const image of event.data) {
+        try {
+          createImage(image);
+        } catch (error) {
+          figma.notify('Image tyoe is unspported, please try again');
+        }
+      }
+    } else {
+      getMany(event.data, selection);
+    }
   }
 };
 
