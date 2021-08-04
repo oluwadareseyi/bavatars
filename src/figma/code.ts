@@ -14,9 +14,12 @@ const createImage = (
     rect = figma.createEllipse();
   }
   rect.fills = [{ type: 'IMAGE', scaleMode: 'FILL', imageHash }];
-  figma.currentPage.appendChild(rect);
-  nodes.push(rect);
-  figma.viewport.scrollAndZoomIntoView(nodes);
+
+  if (!customRect) {
+    figma.currentPage.appendChild(rect);
+    nodes.push(rect);
+    figma.viewport.scrollAndZoomIntoView(nodes);
+  }
 };
 
 const getMany = (data: Uint8Array[], selection: readonly SceneNode[]) => {
@@ -33,7 +36,7 @@ const getMany = (data: Uint8Array[], selection: readonly SceneNode[]) => {
           // @ts-ignore
           createImage(image, selection[index]);
         } catch (error) {
-          figma.notify('Image tyoe is unspported');
+          figma.notify('Image type is unspported');
         }
       } else {
         figma.notify('Please selcct a rectangle or Elipse');
@@ -79,7 +82,7 @@ figma.ui.onmessage = event => {
         try {
           createImage(image);
         } catch (error) {
-          figma.notify('Image tyoe is unspported, please try again');
+          figma.notify('Image type is unspported, please try again');
         }
       }
     } else {
@@ -96,7 +99,7 @@ figma.ui.onmessage = event => {
         try {
           createImage(image);
         } catch (error) {
-          figma.notify('Image tyoe is unspported, please try again');
+          figma.notify('Image type is unspported, please try again');
         }
       }
     } else {
